@@ -1,7 +1,6 @@
 # wxm ignore
 si_prj_data/
 SI/
-lib/
 
 # Prerequisites
 *.d
