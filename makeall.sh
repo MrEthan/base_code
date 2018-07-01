@@ -11,6 +11,8 @@ else
 
 #生成文件转移到output
 mv *.o ./output
+mv src/*.o ./output
+mv src/comm/*.o ./output
 #mv *.out ./output
 
 fi
