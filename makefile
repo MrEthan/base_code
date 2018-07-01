@@ -1,8 +1,8 @@
 #设置编译选项
 CC = gcc
 CFLAGS = -g -D_REENTRANT -Wall
-INC = -I./inc -I./src -I./lib/libcstl-2.3/ -I./lib/libcstl-2.3/cstl -I./lib/libcstl-2.3/src
-LIB = -pthread -L./lib/ -lcstl
+INC = -I./inc -I./src -I./lib/
+LIB = -pthread -L./lib/
 
 #源文件
 SOURCES = $(wildcard *.c src/*.c )  #列出当前目录下所有.c文件 lib/libcstl-2.3/src/*.c

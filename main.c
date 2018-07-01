@@ -2,8 +2,6 @@
 #include "inc/debug.h"
 #include <stdio.h>
 
-extern void cstl_test();
-
 int main()
 {
 	int iRet = 0;
@@ -15,8 +13,6 @@ int main()
 
     printf("cond test\n");
 	pthread_cond_demo();
-	printf("libcstl test\n");
-    cstl_test();
 
 	return 0;
 }
