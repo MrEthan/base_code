@@ -1,6 +1,6 @@
 #…Ë÷√±‡“Î—°œÓ
 CC = gcc
-CFLAGS = -g -D_REENTRANT -Wall
+CFLAGS = -g -D_REENTRANT -Wall -std=gnu99
 INC = -I./inc -I./src -I./src/comm -I./lib/
 LIB = -pthread -L./lib/
 

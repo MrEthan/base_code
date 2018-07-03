@@ -1,31 +1,22 @@
 #ifndef DEBUG_H
 #define DEBUG_H
- 
-#include <stdio.h>
-#include <time.h>
-#include <unistd.h>
-#include <stdlib.h>
 
+typedef enum{
+    EN_ERROR,
+    EN_WARN,
+    EN_DEBUG,
+    EN_INFO,
+}enDebugLevel;
 
-#define MAX_MESG_LEN   1024
+#define DERROR(format, args...) debug_print(EN_ERROR, format, ##args)
+#define DWARN(format, args...) debug_print(EN_WARN, format, ##args)
+#define DDEBUG(format, args...) debug_print(EN_DEBUG, format, ##args)
+#define DINFO(format, args...) debug_print(EN_INFO, format, ##args)
 
-#define SPIDER_LEVEL_DEBUG 0
-#define SPIDER_LEVEL_INFO  1
-#define SPIDER_LEVEL_WARN  2
-#define SPIDER_LEVEL_ERROR 3
-#define SPIDER_LEVEL_CRIT  4 
+void debug_print(int level, const char *format, ...);
 
-#define DEBUG_LEVEL 0
-
-static const char * LOG_STR[] = { 
-    "DEBUG",
-    "INFO",
-    "WARN",
-    "ERROR",
-    "CRIT"
-};
-
-//可变参数 
+#if 0
+//可变参数
 //输出日期，时间，日志级别，源码文件，行号，信息
 //'\'后面不要加注释
 #define SPIDER_LOG(level, format, ...) do{ \
@@ -42,5 +33,6 @@ static const char * LOG_STR[] = {
         exit(-1); \
     } \
 } while(0)
+#endif
 
 #endif //DEBUG_H
