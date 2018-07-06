@@ -64,6 +64,19 @@ extern "C" {
  * containing a pointer to NULL.
  */
 
+#if 0
+#define list_for_each_entry(pos, head, member)                \
+        for (pos = list_entry((head)->next, typeof(*pos), member);    \
+             &pos->member != (head);     \
+             pos = list_entry(pos->member.next, typeof(*pos), member))
+
+#define list_entry(ptr, type, member) \
+        container_of(ptr, type, member)
+
+#define list_for_each(type, p_list, var) \
+   for (var = (type *)list_nth_entry(p_list, 0); var != NULL; var = list_next(var))
+#endif
+
 /**
  * A value stored in a list.
  */

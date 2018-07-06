@@ -24,7 +24,7 @@ static const char * LOG_STR[] = {
     "INFO",
 };
 
-void debug_print(int level, const char *format, ...)
+void debug_print(int level, const char *func_name, const char *format, ...)
 {
     char debug_buf[MAX_LEN_ONE_DEBUG_PRINT];
     char time_str[32];
@@ -36,7 +36,7 @@ void debug_print(int level, const char *format, ...)
     va_start(ap, format);
     strftime(time_str, sizeof(time_str), "%y%m%d-%H:%M:%S", localtime(&now));
     snprintf(debug_buf, MAX_LEN_ONE_DEBUG_PRINT, "[%s][%s][%ld][%s]",
-             time_str, LOG_STR[level], syscall(SYS_gettid), __FUNCTION__);
+             time_str, LOG_STR[level], syscall(SYS_gettid), func_name);
     debug_head_len = strlen(debug_buf);
     vsnprintf(debug_buf + debug_head_len, MAX_LEN_ONE_DEBUG_PRINT - debug_head_len, format, ap);
     va_end(ap);

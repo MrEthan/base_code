@@ -258,21 +258,14 @@ int list_remove_entry(ListEntry **list, ListEntry *entry)
 		/* This is not the first in the list, so we must have a
 		 * previous entry.  Update its 'next' pointer to the new
 		 * value */
-
 		entry->prev->next = entry->next;
 
 		/* If there is an entry following this one, update its 'prev'
 		 * pointer to the new value */
-
 		if (entry->next != NULL) {
 			entry->next->prev = entry->prev;
 		}
 	}
-
-	/* Free the list entry */
-
-	free(entry);
-
 	/* Operation successful */
 
 	return 1;

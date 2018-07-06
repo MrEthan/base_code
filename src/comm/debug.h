@@ -8,12 +8,12 @@ typedef enum{
     EN_INFO,
 }enDebugLevel;
 
-#define DERROR(format, args...) debug_print(EN_ERROR, format, ##args)
-#define DWARN(format, args...) debug_print(EN_WARN, format, ##args)
-#define DDEBUG(format, args...) debug_print(EN_DEBUG, format, ##args)
-#define DINFO(format, args...) debug_print(EN_INFO, format, ##args)
+#define DERROR(format, args...) debug_print(EN_ERROR, __FUNCTION__, format, ##args)
+#define DWARN(format, args...) debug_print(EN_WARN, __FUNCTION__, format, ##args)
+#define DDEBUG(format, args...) debug_print(EN_DEBUG, __FUNCTION__, format, ##args)
+#define DINFO(format, args...) debug_print(EN_INFO, __FUNCTION__, format, ##args)
 
-void debug_print(int level, const char *format, ...);
+void debug_print(int level, const char *func_name, const char *format, ...);
 
 #if 0
 //可变参数
