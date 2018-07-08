@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <pthread.h>
 #include "debug.h"
 
 #define SAFE_FREE(p)  \

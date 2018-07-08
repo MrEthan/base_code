@@ -36,7 +36,7 @@ int main()
 
     printf("timer epoll test.\n");
     timer_test();
-
+	ecdh_test();
 	return 0;
 }
 
