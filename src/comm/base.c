@@ -77,4 +77,14 @@ int base_rwlock_unlock(pthread_rwlock_t *rwlock)
     return ret;
 }
 
+long long get_time_ms(void)
+{
+    struct timespec time;
+    clock_gettime(CLOCK_REALTIME, &time);
+    DDEBUG("time.tv_sec:%d, time.tv_nsec:%ld\n", time.tv_sec, time.tv_nsec);
+    return (time.tv_sec * 1000 + time.tv_nsec / 1000000);
+}
+
+
+
 

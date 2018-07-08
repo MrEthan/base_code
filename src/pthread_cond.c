@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include "comm/base.h"
 
 /* 线程间同步 条件变量使用demo */
 #define ERR_EXIT(m) \
@@ -25,14 +26,6 @@ pthread_cond_t g_cond;
 pthread_t g_thread[CONSUMERS_COUNT + PRODUCERS_COUNT];
 
 static int nready = 0;
-
-long get_time(void)
-{
-    struct timespec time;
-    clock_gettime(CLOCK_REALTIME, &time);
-
-    return (time.tv_sec * 1000000000 + time.tv_nsec)/1000000;
-}
 
 void *consume(void *arg)
 {

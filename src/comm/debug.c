@@ -46,4 +46,58 @@ void debug_print(int level, const char *func_name, const char *format, ...)
     return;
 }
 
+void dumpBuffer(const char *describe, unsigned char *buf, int len)
+{
+    int i = 0, count = 0;
+
+    printf("\n--------dumpBuffer begin----------[%ld]\n", syscall(SYS_gettid));
+    if (!buf || 0 > len){
+        printf("dempBuffer, para err. buf:%p, len:%d\n", buf, len);
+        return;
+    }
+    if (describe){
+        printf("%s, len:%d\n", describe, len);
+    }else{
+        printf("len:%d\n", len);
+    }
+
+    for (i = 0; i < len; i++){
+        if (16 == count){
+            count = 0;
+            printf("\n");
+        }
+        printf("%02x ", buf[i]);
+        count++;
+    }
+    printf("\n--------dumpBuffer end--------\n\n");
+    return;
+}
+
+void dumpBuffer_char(const char *describe, char *buf, int len)
+{
+    int i = 0, count = 0;
+
+    printf("\n--------dumpBuffer begin----------[%ld]\n", syscall(SYS_gettid));
+    if (!buf || 0 > len){
+        printf("dempBuffer, para err. buf:%p, len:%d\n", buf, len);
+        return;
+    }
+    if (describe){
+        printf("%s, len:%d\n", describe, len);
+    }else{
+        printf("len:%d\n", len);
+    }
+
+    for (i = 0; i < len; i++){
+        if (16 == count){
+            count = 0;
+            printf("\n");
+        }
+        printf("%c", buf[i]);
+        count++;
+    }
+    printf("\n--------dumpBuffer end--------\n\n");
+    return;
+}
+
 

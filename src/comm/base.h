@@ -2,8 +2,10 @@
 #define BASE_H
 
 #include <assert.h>
+#include <string.h>
 #include <errno.h>
 #include <pthread.h>
+#include <time.h>
 #include "debug.h"
 
 #define SAFE_FREE(p)  \
@@ -40,5 +42,6 @@ int base_rwlock_wrlock(pthread_rwlock_t *rwlock);
 int base_rwlock_trywrlock(pthread_rwlock_t *rwlock);
 int base_rwlock_unlock(pthread_rwlock_t *rwlock);
 
+long long get_time_ms(void);
 
 #endif //BASE_H

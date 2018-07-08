@@ -14,6 +14,8 @@ typedef enum{
 #define DINFO(format, args...) debug_print(EN_INFO, __FUNCTION__, format, ##args)
 
 void debug_print(int level, const char *func_name, const char *format, ...);
+void dumpBuffer(const char *describe, unsigned char *buf, int len);
+void dumpBuffer_char(const char *describe, char *buf, int len);
 
 #if 0
 //可变参数
