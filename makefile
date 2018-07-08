@@ -2,7 +2,7 @@
 CC = gcc
 CFLAGS = -g -D_REENTRANT -Wall -std=gnu99
 INC = -I./inc -I./src -I./src/comm -I./lib/
-LIB = -pthread -L./lib/
+LIB = -lrt -pthread -L./lib/
 
 #源文件
 SOURCES = $(wildcard *.c src/*.c src/comm/*.c )  #列出当前目录下所有.c文件 lib/libcstl-2.3/src/*.c

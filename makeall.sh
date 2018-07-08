@@ -9,7 +9,7 @@ else
 	make -j 5 #multi thread make
 }
 
-#生成文件转移到output
+#鐢熸垚鏂囦欢杞Щ鍒皁utput
 mv *.o ./output
 mv src/*.o ./output
 mv src/comm/*.o ./output
