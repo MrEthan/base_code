@@ -15,11 +15,9 @@ void hexbyte(char *out, uint8_t b) {
   out[1] = hextable[b&0x0f];
 }
 
-/*  */
 int main()
 {
     char c[100] = {0};
-    char d[100];
 
     hexbyte(c, 100);
     dumpBuffer_char(NULL, c, strlen(c));
