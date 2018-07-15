@@ -6,13 +6,14 @@ if [ "$1" = "clean" ];then
 }
 else
 {
-	make -j 5 #multi thread make
+	make -j 50 #multi thread make
 }
 
-#生成文件转移到output
+#�ƶ�.o�ļ�
 mv *.o ./output
 mv src/*.o ./output
 mv src/comm/*.o ./output
+mv src/encrypt/*.o ./output
 #mv *.out ./output
 
 fi

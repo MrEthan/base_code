@@ -1,5 +1,5 @@
 #include "comm/base.h"
-#include "../lib/ecc/uECC.h"
+#include "uECC.h"
 #include "ecdh.h"
 
 #define ECC_KEY_LEN 24
