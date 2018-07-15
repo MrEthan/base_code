@@ -15,7 +15,7 @@ void hexbyte(char *out, uint8_t b) {
   out[1] = hextable[b&0x0f];
 }
 
-/**/
+/*  */
 int main()
 {
     char c[100] = {0};
