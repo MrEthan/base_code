@@ -280,6 +280,7 @@ void base_epoll_fini(void)
     return;
 }
 
+/* epoll thread example */
 void *epoll_thread(void *arg)
 {
     struct epoll_event evnts[MX_EVNTS];

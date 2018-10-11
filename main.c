@@ -15,12 +15,13 @@ void hexbyte(char *out, uint8_t b) {
   out[1] = hextable[b&0x0f];
 }
 
+extern int print_trace_test(void);
+
 int main()
 {
-    char c[100] = {0};
-
-    hexbyte(c, 100);
-    dumpBuffer_char(NULL, c, strlen(c));
+    //lstLib_test();
+    //timer_test();
+    print_trace_test();
 	return 0;
 }
 

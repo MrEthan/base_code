@@ -1,6 +1,6 @@
 #…Ë÷√±‡“Î—°œÓ
 CC = gcc
-CFLAGS = -g -D_REENTRANT -Wall -std=gnu99
+CFLAGS = -g -D_REENTRANT -Wall -std=gnu99 -rdynamic 
 INC = -I./inc -I./src -I./src/comm -I./lib/ecc -I./lib/openssl/include/
 LIB = -lrt -pthread -lcrypto -lssl #-L./lib/
 
