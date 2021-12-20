@@ -82,7 +82,7 @@ int base_timer_start(int eplfd, int tfd, int value_s, int value_ms, int interval
     epoll_data.eplfd = eplfd;
     epoll_data.fd = tfd;
     epoll_data.callback = callback;
-    epoll_data.data = pdata; //´Ë´¦¹ÒÉÏµÄdataÓÉepoll¸ºÔğÊÍ·Å
+    epoll_data.data = pdata; //æ­¤å¤„æŒ‚ä¸Šçš„dataç”±epollè´Ÿè´£é‡Šæ”¾
     epoll_data.len = len;
     ret = base_epoll_ctl(eplfd, EPOLL_CTL_ADD, tfd, &epoll_data);
     if (ret){
@@ -105,7 +105,7 @@ void base_timer_stop(int eplfd, int tfd)
 
     memset(&its, 0, sizeof(struct itimerspec));
     timerfd_settime(tfd, TFD_TIMER_ABSTIME, &its, NULL);
-    /* Í£Ö¹¶¨Ê±Æ÷, ´ÓepollÕª³ı */
+    /* åœæ­¢å®šæ—¶å™¨, ä»epollæ‘˜é™¤ */
     ret = base_epoll_ctl(eplfd, EPOLL_CTL_DEL, tfd, NULL);
     DDEBUG("eplfd:%d, tfd:%d, ret:%d\n", eplfd, tfd, ret);
     SAFE_CLOSE(tfd);
@@ -127,7 +127,7 @@ void *timer1_callback(void *p_data, int len)
     p_epoll_data = (EpollEvent *)p_data;
     p_timer = p_epoll_data->data;
 
-    //·ÀÖ¹ÖØ¸´´¥·¢£¬¶ÁÈ¡fd
+    //é˜²æ­¢é‡å¤è§¦å‘ï¼Œè¯»å–fd
     ret = read(p_epoll_data->fd, &count, sizeof(unsigned long long));
     printf("\n");
     DDEBUG("read timerfd, event_fd(%d), ret(%d), count(%llu)\n", p_epoll_data->fd, ret, count);
@@ -145,7 +145,7 @@ void *timer1_callback(void *p_data, int len)
     return NULL;
 }
 
-//²âÊÔÀı×Ó
+//æµ‹è¯•ä¾‹å­
 void do_action(int epfd)
 {
     int tfd = -1;
@@ -179,7 +179,7 @@ exit:
     return;
 }
 
-//²âÊÔÀı×Ó Ò»´ÎĞÔ¶¨Ê±Æ÷
+//æµ‹è¯•ä¾‹å­ ä¸€æ¬¡æ€§å®šæ—¶å™¨
 void do_action1(int epfd)
 {
     int tfd = -1;
@@ -231,11 +231,6 @@ int timer_test(void)
 
     do_action(eplfd);
     do_action1(eplfd);
-
-    while(1)
-    {
-        sleep(1);
-    }
 
     return ret;
 }

@@ -8,19 +8,22 @@ typedef enum{
     EN_INFO,
 }enDebugLevel;
 
-#define DERROR(format, args...) debug_print(EN_ERROR, __FUNCTION__, format, ##args)
-#define DWARN(format, args...) debug_print(EN_WARN, __FUNCTION__, format, ##args)
-#define DDEBUG(format, args...) debug_print(EN_DEBUG, __FUNCTION__, format, ##args)
-#define DINFO(format, args...) debug_print(EN_INFO, __FUNCTION__, format, ##args)
+#define ASSERT(expr) ((expr) ? (void)0 : debug_assert_failed((unsigned char *)__FILE__, __LINE__));
 
-void debug_print(int level, const char *func_name, const char *format, ...);
+#define DERROR(format, args...) debug_print(EN_ERROR, __FUNCTION__, __LINE__, format, ##args)
+#define DWARN(format, args...) debug_print(EN_WARN, __FUNCTION__, __LINE__, format, ##args)
+#define DDEBUG(format, args...) debug_print(EN_DEBUG, __FUNCTION__, __LINE__, format, ##args)
+#define DINFO(format, args...) debug_print(EN_INFO, __FUNCTION__, __LINE__, format, ##args)
+
+void debug_print(int level, const char *func_name, int line_number, const char *format, ...);
 void dumpBuffer(const char *describe, unsigned char *buf, int len);
 void dumpBuffer_char(const char *describe, char *buf, int len);
+void debug_assert_failed(unsigned char* file, unsigned int line);
 
 #if 0
-//¿É±ä²ÎÊý
-//Êä³öÈÕÆÚ£¬Ê±¼ä£¬ÈÕÖ¾¼¶±ð£¬Ô´ÂëÎÄ¼þ£¬ÐÐºÅ£¬ÐÅÏ¢
-//'\'ºóÃæ²»Òª¼Ó×¢ÊÍ
+//å¯å˜å‚æ•°
+//è¾“å‡ºæ—¥æœŸï¼Œæ—¶é—´ï¼Œæ—¥å¿—çº§åˆ«ï¼Œæºç æ–‡ä»¶ï¼Œè¡Œå·ï¼Œä¿¡æ¯
+//'\'åŽé¢ä¸è¦åŠ æ³¨é‡Š
 #define SPIDER_LOG(level, format, ...) do{ \
     if (level >= DEBUG_LEVEL) {\
         time_t now = time(NULL);                      \

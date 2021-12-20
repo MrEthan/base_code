@@ -3,13 +3,15 @@
 
 #include "hash-table.h"
 
+#define MX_EVNTS 10
+
 typedef void *(*epoll_callback)(void *data, int len);
-/* EPOLLÊÂ¼ş¿ØÖÆ¿é */
+/* EPOLLäº‹ä»¶æ§åˆ¶å— */
 typedef struct{
     int eplfd;
     int fd; //hash key
     epoll_callback callback;
-    void *data; //¹ÒÉÏµÄdataÓÉepoll½Ó¹Ü£¬epollÄ£¿é¸ºÔğÊÍ·Å
+    void *data; //æŒ‚ä¸Šçš„dataç”±epollæ¥ç®¡ï¼Œepollæ¨¡å—è´Ÿè´£é‡Šæ”¾
     int len;
 }EpollEvent;
 

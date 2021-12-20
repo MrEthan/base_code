@@ -1,30 +1,97 @@
-#ÉèÖÃ±àÒëÑ¡Ïî
-CC = gcc
-CFLAGS = -g -D_REENTRANT -Wall -std=gnu99 -rdynamic 
+#è®¾ç½®ç¼–è¯‘é€‰é¡¹
+CC = @echo [CC] $@;gcc
+CPP = @echo [CPP] $@;g++
+AR = @echo [AR] $@;ar
+CFLAGS = -g -O0 -D_REENTRANT -Wall -std=gnu99 -rdynamic
+SHARED_FLAGS = -shared -fPIC
+
+OUTPUT_DIR = output
+LIB_DIR = lib
+
 INC = -I./inc -I./src -I./src/comm -I./lib/ecc -I./lib/openssl/include/
-LIB = -lrt -pthread -lcrypto -lssl #-L./lib/
+LIB = -lrt -pthread -lcrypto -lssl -L./lib/
+#æºæ–‡ä»¶
+LIB_SRC = $(wildcard src/*.c \
+					 src/comm/*.c \
+					 src/ipc/*.c \
+					 src/select/*.c \
+					 src/encrypt/*.c \
+					 src/co_routines/*.c \
+					 src/data_struct/*.c \
+					 lib/ecc/*.c)  #åˆ—å‡ºå½“å‰ç›®å½•ä¸‹æ‰€æœ‰.cæ–‡ä»¶ lib/libcstl-2.3/src/*.c
+BIN_SRC = $(wildcard *.c)
 
-#Ô´ÎÄ¼ş
-SOURCES = $(wildcard *.c src/*.c src/comm/*.c src/encrypt/*.c lib/ecc/*.c)  #ÁĞ³öµ±Ç°Ä¿Â¼ÏÂËùÓĞ.cÎÄ¼ş lib/libcstl-2.3/src/*.c
+#ç›®æ ‡ä¾èµ–æ–‡ä»¶.o
+LIB_OBJS = $(patsubst %.c, %.o, $(LIB_SRC))
+BIN_OBJS = $(patsubst %.c, %.o, $(BIN_SRC))
 
-#Ä¿±êÒÀÀµÎÄ¼ş.o
-OBJS = $(patsubst %.c,%.o,$(SOURCES))
+LIB_TARGET = $(LIB_DIR)/libbase_code.so
+LIB_TARGET_STATIC = $(LIB_DIR)/libbase_code.a
+BIN_TARGET = a.out
+GTEST_TARGET = gtester
 
-#Ä¿±êÎÄ¼ş
-all: a.out #debug
+#$(warning LIB_OBJS:$(LIB_OBJS))
 
-#±àÒëÄ¿±êÒÀÀµÎÄ¼ş
-%.o:%.c
-	$(CC) $(CFLAGS) $(INC) -c $< -o $@ $(LIB)
+#ç›®æ ‡æ–‡ä»¶
+all: $(LIB_TARGET_STATIC) $(BIN_TARGET) $(GTEST_TARGET) #debug $(LIB_TARGET)
+	# make -C gtest
 
-#makefileµ÷ÊÔ
+# ç¼–è¯‘base_codeåº“
+lib:$(LIB_TARGET_STATIC) $(LIB_TARGET)
+
+#makefileè°ƒè¯•
 debug:
-		@echo $(SOURCES)
-		@echo $(OBJS)
+	@echo LIB_SRC: $(LIB_SRC)
+	@echo LIB_OBJS: $(LIB_OBJS)
+	@echo LIB_TARGET: $(LIB_TARGET)
+	@echo LIB_TARGET_STATIC: $(LIB_TARGET_STATIC)
+	@echo BIN_SRC: $(BIN_SRC)
+	@echo BIN_OBJS: $(BIN_OBJS)
+	@echo BIN_TARGET: $(BIN_TARGET)
+	@echo GTEST_SRC: $(GTEST_SRC)
+	@echo GTEST_INC: $(GTEST_INC)
+	@echo GTEST_OBJS: $(GTEST_OBJS)
+	@echo GTEST_TARGET: $(GTEST_TARGET)
 
-a.out:$(OBJS)
-	$(CC) $(CFLAGS) $(INC)   $(OBJS) -o a.out $(LIB)
+# ç¼–è¯‘åŠ¨æ€åº“
+$(LIB_TARGET):$(LIB_OBJS)
+	$(CC) $^ $(CFLAGS) $(SHARED_FLAGS) $(INC) $(LIB) -o $@
+
+# ç¼–è¯‘é™æ€åº“
+$(LIB_TARGET_STATIC):$(LIB_OBJS)
+	$(AR) -rcs -o $@ $^
+
+# ç¼–è¯‘å¯æ‰§è¡Œæ–‡ä»¶
+$(BIN_TARGET):$(BIN_OBJS)
+	$(CC) $(CFLAGS) $^ $(INC) $(LIB) -L./lib -lbase_code -o $@
+
+#ç¼–è¯‘ç›®æ ‡ä¾èµ–æ–‡ä»¶
+%.o:%.c
+	$(CC) $(CFLAGS) $(SHARED_FLAGS) $(INC) -c $< -o $@ $(LIB)
+
+###################################################################
+# gtestç¼–è¯‘
+GTEST_DIR = gtest
+GTEST_INC = -I./$(GTEST_DIR)/include
+GTEST_INC += -I./$(GTEST_DIR)/cases
+GTEST_INC += -I./$(GTEST_DIR)/../inc
+GTEST_LIB = -lpthread -L./lib -lbase_code
+
+GTEST_SRC = $(wildcard	$(GTEST_DIR)/*.cc \
+            			$(GTEST_DIR)/src/gtest-all.cc \
+            			$(GTEST_DIR)/cases/*.cc \
+            			$(GTEST_DIR)/cases/data_struct/*.cpp)
+GTEST_OBJS = $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(GTEST_SRC)))
+
+$(GTEST_TARGET):$(GTEST_OBJS)
+	$(CPP) -g -Wall $^ $(GTEST_INC) $(GTEST_LIB) -L./lib -lbase_code -o $@
+
+%.o:%.cc
+	$(CPP) -g -Wall $(GTEST_INC) -c $< -o $@
+%.o:%.cpp
+	$(CPP) -g -Wall $(GTEST_INC) -c $< -o $@
+###################################################################
 
 .PHONY: clean
 clean:
-	rm -rf *.o $(OBJS) all
+	rm -rf *.o $(LIB_OBJS) $(BIN_OBJS) $(LIB_TARGET) $(BIN_TARGET) $(GTEST_TARGET)

@@ -9,7 +9,7 @@
 #include <string.h>
 #include "comm/base.h"
 
-/* Ïß³Ì¼äÍ¬²½ Ìõ¼ş±äÁ¿Ê¹ÓÃdemo */
+/* çº¿ç¨‹é—´åŒæ­¥ æ¡ä»¶å˜é‡ä½¿ç”¨demo */
 #define ERR_EXIT(m) \
         do \
         { \
@@ -30,7 +30,8 @@ static int nready = 0;
 void *consume(void *arg)
 {
     pthread_detach(pthread_self());
-
+    int idx = *(int *)arg;
+    
     while (1)
     {
         pthread_mutex_lock(&g_mutex);
@@ -39,7 +40,7 @@ void *consume(void *arg)
             pthread_cond_wait(&g_cond, &g_mutex);
         }
         --nready;
-        printf("[%lu]consume a product, nready:%d\n", pthread_self(), nready);
+        printf("[%d][%lu]consume a product, nready:%d\n", idx, pthread_self(), nready);
 
         pthread_mutex_unlock(&g_mutex);
         usleep(10);
@@ -51,6 +52,8 @@ void *produce(void *arg)
 {
     static int var = 2;
     pthread_detach(pthread_self());
+    int idx = *(int *)arg;
+
     while (1)
     {
         pthread_mutex_lock(&g_mutex);
@@ -58,7 +61,7 @@ void *produce(void *arg)
         {
             var--;
             nready += 5;
-            printf("[%lu]nready:%d, var:%d, signal..\n", pthread_self(), nready, var);
+            printf("[%d][%lu]nready:%d, var:%d, signal..\n", idx, pthread_self(), nready, var);
             pthread_cond_signal(&g_cond);
         }
         pthread_mutex_unlock(&g_mutex);
@@ -76,16 +79,15 @@ int pthread_cond_demo(void)
     pthread_cond_init(&g_cond, NULL);
 
     for (i = 0; i < CONSUMERS_COUNT; i++)
-        pthread_create(&g_thread[i], NULL, consume, (void *)i);
+        pthread_create(&g_thread[i], NULL, consume, (void *)&i);
 
     sleep(1);
 
     for (i = 0; i < PRODUCERS_COUNT; i++)
-        pthread_create(&g_thread[CONSUMERS_COUNT + i], NULL, produce, (void *)i);
+        pthread_create(&g_thread[CONSUMERS_COUNT + i], NULL, produce, (void *)&i);
 
-    pthread_mutex_destroy(&g_mutex);
-    pthread_cond_destroy(&g_cond);
-
+//    pthread_cond_destroy(&g_cond);
+//    pthread_mutex_destroy(&g_mutex);
     return 0;
 }
 

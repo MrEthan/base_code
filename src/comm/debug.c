@@ -6,6 +6,7 @@
 #include <sys/syscall.h>
 #include <string.h>
 #include "debug.h"
+#include "backtrace.h"
 
 #define MAX_LEN_ONE_DEBUG_PRINT   1024
 
@@ -24,7 +25,7 @@ static const char * LOG_STR[] = {
     "INFO",
 };
 
-void debug_print(int level, const char *func_name, const char *format, ...)
+void debug_print(int level, const char *func_name, int line_number, const char *format, ...)
 {
     char debug_buf[MAX_LEN_ONE_DEBUG_PRINT];
     char time_str[32];
@@ -34,15 +35,15 @@ void debug_print(int level, const char *func_name, const char *format, ...)
     time_t now = time(NULL);
 
     va_start(ap, format);
-    strftime(time_str, sizeof(time_str), "%y%m%d-%H:%M:%S", localtime(&now));
-    snprintf(debug_buf, MAX_LEN_ONE_DEBUG_PRINT, "[%s][%s][%ld][%s]",
-             time_str, LOG_STR[level], syscall(SYS_gettid), func_name);
+    strftime(time_str, sizeof(time_str), "%y%m%d %H:%M:%S", localtime(&now));
+    snprintf(debug_buf, MAX_LEN_ONE_DEBUG_PRINT, "[%s][%s][%ld][%s:%d]",
+             time_str, LOG_STR[level], syscall(SYS_gettid), func_name, line_number);
     debug_head_len = strlen(debug_buf);
     vsnprintf(debug_buf + debug_head_len, MAX_LEN_ONE_DEBUG_PRINT - debug_head_len, format, ap);
     va_end(ap);
 
-    printf("%s", debug_buf);
-
+    printf("%s\n", debug_buf);
+    // fflush(stdout);
     return;
 }
 
@@ -98,6 +99,15 @@ void dumpBuffer_char(const char *describe, char *buf, int len)
     }
     printf("\n--------dumpBuffer end--------\n\n");
     return;
+}
+
+void debug_assert_failed(unsigned char* file, unsigned int line)
+{
+    printf("assert faile, file:%s, line:%d\r\n", file, line);
+    print_trace(1);
+    while(1){
+        ;
+    }
 }
 
 

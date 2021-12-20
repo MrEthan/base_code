@@ -1,13 +1,18 @@
 #ifndef BASE_H
 #define BASE_H
 
-#include <assert.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <pthread.h>
+#include <sys/prctl.h>
 #include <time.h>
+#include <errno.h>
+#include <assert.h>
+#include <unistd.h>
 #include "debug.h"
+#include "basetype.h"
+
 
 #define SAFE_FREE(p)  \
 do{                   \
@@ -25,6 +30,9 @@ do{                    \
         fd = -1;        \
     }                   \
 }while(0)
+
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
 
 #ifndef container_of
 #define container_of(ptr, type, member) ({          \

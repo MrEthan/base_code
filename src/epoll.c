@@ -16,13 +16,6 @@
 #include "comm/base.h"
 #include "epoll.h"
 
-
-
-
-
-
-#define MX_EVNTS 10
-
 static ListEntry *g_p_epoll_list = NULL; //BsaeEpoll
 pthread_rwlock_t g_epoll_list_lock;
 
@@ -45,14 +38,14 @@ static void base_epoll_free_event_hash(HashTable *p_event_hash)
     hash_table_free(p_event_hash);
 }
 
-/* ÊÍ·ÅepollÊÂ¼þ¿ØÖÆ¿éºÍ¸´ºÏ×ÊÔ´ */
+/* é‡Šæ”¾epolläº‹ä»¶æŽ§åˆ¶å—å’Œå¤åˆèµ„æº */
 void base_epoll_free_event_block(void *p_data)
 {
     EpollEvent *p_evt_block = NULL;
 
     if (NULL != p_data){
         p_evt_block = p_data;
-        SAFE_FREE(p_evt_block->data); //epollÊÍ·Å½Ó¹ÜµÄ¸´ºÏ×ÊÔ´
+        SAFE_FREE(p_evt_block->data); //epollé‡Šæ”¾æŽ¥ç®¡çš„å¤åˆèµ„æº
         SAFE_FREE(p_evt_block);
     }
     return ;
@@ -83,17 +76,17 @@ int base_epoll_create(void)
         return -1;
     }
 
-    /* ´´½¨event hash */
+    /* åˆ›å»ºevent hash */
     p_hash = hash_table_new(int_hash, int_equal);
     if (NULL == p_hash){
        DERROR("epoll create, new hash failed.\n");
        ret = -1;
        goto EXIT;
     }
-    /* ×¢²áhashº¯Êý */
+    /* æ³¨å†Œhashå‡½æ•° */
     hash_table_register_free_functions(p_hash, NULL, base_epoll_free_event_block);
 
-    /* ´´½¨epollÁ´±í½Úµã */
+    /* åˆ›å»ºepollé“¾è¡¨èŠ‚ç‚¹ */
     p_epoll = malloc(sizeof(BsaeEpoll));
     if (NULL == p_epoll){
         DERROR("create list node, malloc err.\n");
@@ -133,15 +126,15 @@ void base_epoll_close(int epfd)
         goto EXIT;
     }
     p_epoll = p_node->data;
-    /* ÕªÁ´ */
+    /* æ‘˜é“¾ */
     list_remove_entry(&g_p_epoll_list, (void *)p_node);
-    /* ÕªÁ´ºóÒÑ¾­²»¿ÉÄÜÓÐÈËÄÃµ½Õâ¿é×ÊÔ´, ¿ÉÒÔ½âËø */
+    /* æ‘˜é“¾åŽå·²ç»ä¸å¯èƒ½æœ‰äººæ‹¿åˆ°è¿™å—èµ„æº, å¯ä»¥è§£é” */
     base_rwlock_unlock(&g_epoll_list_lock);
 
-    /* ÊÍ·Å¸´ºÏ×ÊÔ´ */
+    /* é‡Šæ”¾å¤åˆèµ„æº */
     base_epoll_free_event_hash(p_epoll->p_event_hash);
 
-    /* ÊÍ·Å±¾Á´±í½Úµã */
+    /* é‡Šæ”¾æœ¬é“¾è¡¨èŠ‚ç‚¹ */
     SAFE_FREE(p_epoll);
 
 EXIT:
@@ -163,7 +156,7 @@ int base_epoll_ctl(int epfd, int op, int event_fd, EpollEvent *p_epoll_type)
 
     base_rwlock_wrlock(&g_epoll_list_lock);
 
-    /* ¸ù¾Ýepoll fd²éÕÒepoll Á´±í½Úµã */
+    /* æ ¹æ®epoll fdæŸ¥æ‰¾epoll é“¾è¡¨èŠ‚ç‚¹ */
     p_node = list_find_data(g_p_epoll_list, base_epoll_list_equal, &epfd);
     if (NULL == p_node){
         DERROR("epoll do not existed. epfd:%d\n", epfd);
@@ -187,12 +180,13 @@ int base_epoll_ctl(int epfd, int op, int event_fd, EpollEvent *p_epoll_type)
             ev.data.ptr = p_evt_blk;
             ret = epoll_ctl(epfd, op, event_fd, &ev);
             if (0 != ret){
-                DERROR("epoll ctl add, failed. ret :%d, err:%s\n", ret, strerror(errno));
+                DERROR("epoll ctl add, failed. epfd:%d event_fd:%d ret :%d, err:%s\n",
+                                               epfd, event_fd, ret, strerror(errno));
                 ret = -1;
                 goto EXIT;
             }
 
-            /* µÃµ½epoll Á´±í½Úµã, Ìí¼Óepoll¿ØÖÆ¿é */
+            /* å¾—åˆ°epoll é“¾è¡¨èŠ‚ç‚¹, æ·»åŠ epollæŽ§åˆ¶å— */
             if (1 != hash_table_insert(p_epoll->p_event_hash, (HashTableKey)&event_fd, (HashTableValue)p_evt_blk)){
                 DERROR("epoll ctl add, insert hash failed. epfd:%d, event_fd:%d\n", epfd, event_fd);
                 goto EXIT;
@@ -205,19 +199,19 @@ int base_epoll_ctl(int epfd, int op, int event_fd, EpollEvent *p_epoll_type)
                 DERROR("epoll ctl del, failed. ret :%d, err:%s\n", ret, strerror(errno));
             }
 
-            /* É¾³ýepoll¿ØÖÆ¿é */
+            /* åˆ é™¤epollæŽ§åˆ¶å— */
             if (1 != hash_table_remove(p_epoll->p_event_hash, (HashTableKey)&event_fd)){
                 DERROR("epoll ctl del, hash table remove failed. ret:%d\n", ret);
             }
             break;
 
         case EPOLL_CTL_MOD:
-            /* É¾³ýÔ­epoll¿ØÖÆ¿é */
+            /* åˆ é™¤åŽŸepollæŽ§åˆ¶å— */
             if (1 != hash_table_remove(p_epoll->p_event_hash, (HashTableKey)&event_fd)){
                 DERROR("epoll ctl mod, hash table remove failed. ret:%d\n", ret);
             }
 
-            /*´´½¨ÐÂµÄepoll¿ØÖÆ¿é*/
+            /*åˆ›å»ºæ–°çš„epollæŽ§åˆ¶å—*/
             p_evt_blk = (EpollEvent *)malloc(sizeof(EpollEvent));
             if (NULL == p_evt_blk){
                 DERROR("epoll ctl mod, malloc new event block err.");
@@ -225,7 +219,7 @@ int base_epoll_ctl(int epfd, int op, int event_fd, EpollEvent *p_epoll_type)
                 goto EXIT;
             }
 
-            /* ³õÊ¼»¯¿ØÖÆ¿éÊý¾Ý, Ìí¼Óµ½epoll */
+            /* åˆå§‹åŒ–æŽ§åˆ¶å—æ•°æ®, æ·»åŠ åˆ°epoll */
             memset(&ev, 0, sizeof(ev));
             memset(p_evt_blk, 0, sizeof(EpollEvent));
             memcpy(p_evt_blk, p_epoll_type, sizeof(EpollEvent));
@@ -233,14 +227,14 @@ int base_epoll_ctl(int epfd, int op, int event_fd, EpollEvent *p_epoll_type)
             ev.data.ptr = p_evt_blk;
             ret = epoll_ctl(epfd, op, event_fd, &ev);
             if (0 != ret){
-                DERROR("epoll ctl add, failed. ret :%d, err:%s\n", ret, strerror(errno));
+                DERROR("epoll ctl mod, failed. ret :%d, err:%s\n", ret, strerror(errno));
                 ret = -1;
                 goto EXIT;
             }
 
-            /* °ÑÐÂµÄepoll¿ØÖÆ¿éÌí¼Óµ½hash±í */
+            /* æŠŠæ–°çš„epollæŽ§åˆ¶å—æ·»åŠ åˆ°hashè¡¨ */
             if (1 != hash_table_insert(p_epoll->p_event_hash, (HashTableKey)&event_fd, (HashTableValue)p_evt_blk)){
-                DERROR("epoll ctl add, insert hash failed. epfd:%d, event_fd:%d\n", epfd, event_fd);
+                DERROR("epoll ctl mod, insert hash failed. epfd:%d, event_fd:%d\n", epfd, event_fd);
                 goto EXIT;
             }
             break;

@@ -1,6 +1,8 @@
 # wxm ignore
 si_prj_data/
 SI/
+.idea
+.vscode
 
 # Prerequisites
 *.d
@@ -51,6 +53,7 @@ SI/
 *.cmd
 .tmp_versions/
 modules.order
+.vscode
 Module.symvers
 Mkfile.old
 dkms.conf

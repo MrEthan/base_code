@@ -1,51 +1,135 @@
-/* ÓÃÓÚ´òÓ¡º¯Êýµ÷ÓÃÕ» */
-
-#include <time.h>
-#include <stdio.h>
-#include <pthread.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-#include <assert.h>
+/*
+ * ï¿½ï¿½ï¿½ï¿½ï¿½ì³£ï¿½ï¿½Ö¹Ê±ï¿½ï¿½Ó¡ï¿½ì³£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¶ï¿½Õ»
+ * gcc -g -rdynamic backtrace.c
+ *
+ * ï¿½ï¿½ï¿½Ð³ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ï¿½ï¿½:
+ * System error, Stack trace:
+ * 0 ./BackTraceTest(SystemErrorHandler+0x77) [0x40095b]
+ * 1 /lib64/libc.so.6() [0x3a4fe326b0]
+ * 2 ./BackTraceTest(Fun1+0x10) [0x400a10]
+ * 3 ./BackTraceTest(Fun+0xe) [0x400a23]
+ * 4 ./BackTraceTest(main+0x37) [0x400a5c]
+ * 5 /lib64/libc.so.6(__libc_start_main+0xfd) [0x3a4fe1ed5d]
+ * 6 ./BackTraceTest() [0x400829]
+ * Segmentation fault (core dumped)
+ *
+ * gdbï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
+ * gdb BackTraceTest
+ * (gdb) info line *0x400a10
+ * Line 66 of "BackTraceTest.c" starts at address 0x400a0c <Fun1+12> and ends at 0x400a13 <Fun1+19>.
+ * (gdb) list *0x400a10
+ * 0x400a10 is in Fun1 (BackTraceTest.c:66).
+ * warning: Source file is more recent than executable.
+ * 61	}
+ * 62
+ * 63	void Fun1()
+ * 64	{
+ * 65		char *p=NULL;
+ * 66		*p = 'A';
+ * 67	}
+ * 68
+ * 69	void Fun()
+ * 70	{
+ *
+ *
+ * addr2line ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Ó¦ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
+ * addr2line  -e BackTraceTest -i 0x400a10
+ * /home/cyf/workspace/BackTraceTest/BackTraceTest.c:66
+ *
+ */
+#include "backtrace.h"
 #include "debug.h"
-#include "base.h"
 #include <execinfo.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
+typedef struct {
+    int argc;
+    char argv[10][128];
+} BacktraceParam;
 
-/* Obtain a backtrace and print it to @code{stdout}. */
-void print_trace (void)
+static BacktraceParam g_backtrace_var;
+
+/* p_str - ï¿½ï¿½ï¿½ï¿½Õ»ï¿½ï¿½Ï¢ ï¿½ï¿½./a.out(thread_mq_notify+0x80) [0x8051a62]  */
+static void print_addr2line(char *p_str)
 {
-    void *array[10];
-    int size;
-    char **strings;
-    int i;
-    size = backtrace(array, 10);
-    strings = backtrace_symbols(array, size);
-    if(NULL == strings)
-    {
-        perror("backtrace_synbols");
-        exit(EXIT_FAILURE);
+    char cmd[1024]            = {0};
+    char addr_buf[2 + 64 + 1] = {0};
+    char *p                   = NULL;
+    char name[128]            = {0};
+
+    ASSERT(NULL != p_str);
+
+    p = strchr(p_str, '[');
+    if (p != NULL) {
+        /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ '[' ']' */
+        strncpy(addr_buf, p + 1, strlen(p) - 2);
+        /* ï¿½ï¿½×°ï¿½ï¿½ï¿½ï¿½ */
+        strncpy(name, g_backtrace_var.argv[0], strlen(g_backtrace_var.argv[0]));
+        sprintf(cmd, "addr2line -e %s -i %s", name, addr_buf);
+//        DDEBUG("%s\n", cmd);
+        system(cmd);
     }
-
-    printf ("Obtained %zd stack frames.\n", size);
-
-    for (i = 0; i < size; i++)
-        printf ("%s\n", strings[i]);
-
-    free (strings);
-    strings = NULL;
 }
 
-/* A dummy function to make the backtrace more interesting. */
-void dummy_function (void)
+static void backtrace_init_argv(int argc, char **argv)
 {
-    print_trace ();
+    int i = 0;
+
+    memset(&g_backtrace_var, 0, sizeof(g_backtrace_var));
+    for (i = 0; i < argc; i++) {
+        strncpy(&g_backtrace_var.argv[i][0], &argv[i][0], sizeof(g_backtrace_var.argv[i]));
+    }
 }
 
-int print_trace_test (void)
+void print_trace(int signum)
 {
-    dummy_function ();
+    const int len = 1024;
+    void *func[len];
+    int size;
+    int i;
+    char **funs;
+
+    signal(signum, SIG_DFL);
+    size = backtrace(func, len);
+    funs = (char **)backtrace_symbols(func, size);
+    fprintf(stderr, "System error, Stack trace:\n");
+    for (i = 0; i < size; ++i) {
+        fprintf(stderr, "%d %s \n", i, funs[i]);
+        print_addr2line(funs[i]);
+    }
+    free(funs);
+}
+
+void backtrace_init(int argc, char **argv)
+{
+    backtrace_init_argv(argc, argv);
+    signal(SIGSEGV, print_trace); // Invaild memory address
+    signal(SIGABRT, print_trace); // Abort signal
+    signal(SIGBUS, print_trace);
+    signal(SIGFPE, print_trace);
+    signal(SIGSTKFLT, print_trace);
+    signal(SIGXFSZ, print_trace);
+    signal(SIGSYS, print_trace);
+}
+
+void Fun1()
+{
+    char *p = NULL;
+    *p      = 'A';
+}
+
+void Fun()
+{
+    Fun1();
+}
+
+int print_trace_test()
+{
+    signal(SIGSEGV, print_trace); // Invaild memory address
+    signal(SIGABRT, print_trace); // Abort signal
+    Fun();
     return 0;
 }
-
-

@@ -1,7 +1,10 @@
-#ifndef TIMER_POSIX_H
-#define TIMER_POSIX_H
+#ifndef BACK_TRACE_H
+#define BACK_TRACE_H
 
-int timer_test(void);
+
+void print_trace(int signum);
+void backtrace_init(int argc, char **argv);
+int print_trace_test();
 
 #endif
 
