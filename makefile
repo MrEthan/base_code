@@ -34,7 +34,6 @@ GTEST_TARGET = gtester
 
 #目标文件
 all: $(LIB_TARGET_STATIC) $(BIN_TARGET) $(GTEST_TARGET) #debug $(LIB_TARGET)
-	# make -C gtest
 
 # 编译base_code库
 lib:$(LIB_TARGET_STATIC) $(LIB_TARGET)
@@ -72,14 +71,17 @@ $(BIN_TARGET):$(BIN_OBJS)
 ###################################################################
 # gtest编译
 GTEST_DIR = gtest
-GTEST_INC = -I./$(GTEST_DIR)/include
+GTEST_INC = -I./$(GTEST_DIR)
+GTEST_INC += -I./$(GTEST_DIR)/include
+GTEST_INC += -I./$(GTEST_DIR)/src
 GTEST_INC += -I./$(GTEST_DIR)/cases
 GTEST_INC += -I./$(GTEST_DIR)/../inc
 GTEST_LIB = -lpthread -L./lib -lbase_code
 
 GTEST_SRC = $(wildcard	$(GTEST_DIR)/*.cc \
-            			$(GTEST_DIR)/src/gtest-all.cc \
+            			$(GTEST_DIR)/src/*.cc \
             			$(GTEST_DIR)/cases/*.cc \
+            			$(GTEST_DIR)/cases/*.cpp \
             			$(GTEST_DIR)/cases/data_struct/*.cpp)
 GTEST_OBJS = $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(GTEST_SRC)))
 

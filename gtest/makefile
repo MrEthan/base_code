@@ -15,8 +15,7 @@ INCLUDES += -I./include
 INCLUDES += -I./cases
 INCLUDES += -I../inc
 
-CPPFILES = $(wildcard	*.cc \
-						src/gtest-all.cc \
+CPPFILES = $(wildcard	src/*.cc \
 						cases/*.cc \
 						cases/data_struct/*.cc)
 CFILES = $(wildcard	*.c \
