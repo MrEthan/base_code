@@ -9,7 +9,7 @@ else
 	make -j 50 #multi thread make
 }
 
-#ÒÆ¶¯.oÎÄ¼ş
+#ç§»åŠ¨.oæ–‡ä»¶
 mv *.o ./output
 mv src/*.o ./output
 mv src/comm/*.o ./output
